@@ -1,0 +1,55 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo">⚙️</div>
+      <h1>IoT Monitor</h1>
+      <p>Create your workspace</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #regForm="ngForm">
+      <div class="field">
+        <label>Company / Workspace Name</label>
+        <input
+          type="text"
+          [(ngModel)]="form.tenantName"
+          name="tenantName"
+          placeholder="Acme Corporation"
+          required
+        />
+      </div>
+
+      <div class="field">
+        <label>Admin Email</label>
+        <input
+          type="email"
+          [(ngModel)]="form.email"
+          name="email"
+          placeholder="admin@acme.com"
+          required
+        />
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input
+          type="password"
+          [(ngModel)]="form.password"
+          name="password"
+          placeholder="••••••••"
+          required
+          minlength="8"
+        />
+      </div>
+
+      <div class="error" *ngIf="error">{{ error }}</div>
+
+      <button type="submit" [disabled]="loading" class="btn-primary">
+        {{ loading ? 'Creating workspace...' : 'Create workspace' }}
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Already have an account? <a routerLink="/login">Sign in</a>
+    </div>
+  </div>
+</div>

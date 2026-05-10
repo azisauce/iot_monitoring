@@ -1,0 +1,102 @@
+<div class="devices-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <a routerLink="/dashboard" class="back-link">← Dashboard</a>
+      <h1>Device Management</h1>
+      <span class="device-count">{{ devices.length }} devices</span>
+    </div>
+    <button *ngIf="canManage()" class="btn-add" (click)="openAddModal()">
+      + Register Device
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="state-msg">Loading devices...</div>
+  <div *ngIf="error" class="state-error">{{ error }}</div>
+
+  <!-- Device Grid -->
+  <div class="device-grid" *ngIf="!loading && !error">
+    <div *ngIf="devices.length === 0" class="empty-state">
+      <div class="empty-icon">📡</div>
+      <p>No devices registered yet.</p>
+      <button *ngIf="canManage()" class="btn-add" (click)="openAddModal()">Register your first device</button>
+    </div>
+
+    <div class="device-card" *ngFor="let device of devices">
+      <div class="card-top">
+        <div class="device-info">
+          <h3>{{ device.name }}</h3>
+          <code class="device-id">{{ device.device_id }}</code>
+        </div>
+        <span class="status-badge" [ngClass]="getStatusClass(device.status)">
+          {{ device.status }}
+        </span>
+      </div>
+
+      <div class="card-meta">
+        <span *ngIf="device.zone" class="meta-tag">📍 {{ device.zone }}</span>
+        <span class="meta-tag">🕐 {{ device.last_seen ? (device.last_seen | date:'short') : 'Never seen' }}</span>
+      </div>
+
+      <div class="card-key" *ngIf="canManage()">
+        <label>Device Key</label>
+        <code>{{ device.device_key }}</code>
+      </div>
+
+      <div class="card-actions" *ngIf="canManage()">
+        <button
+          *ngIf="device.status !== 'active'"
+          (click)="setStatus(device, 'active')"
+          class="btn-status btn-activate">
+          Activate
+        </button>
+        <button
+          *ngIf="device.status !== 'maintenance'"
+          (click)="setStatus(device, 'maintenance')"
+          class="btn-status btn-maintenance">
+          Maintenance
+        </button>
+        <button
+          *ngIf="device.status !== 'inactive'"
+          (click)="setStatus(device, 'inactive')"
+          class="btn-status btn-deactivate">
+          Deactivate
+        </button>
+        <button
+          *ngIf="userRole === 'admin'"
+          (click)="deleteDevice(device)"
+          class="btn-status btn-delete">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Device Modal -->
+  <div class="modal-overlay" *ngIf="showAddModal" (click)="showAddModal = false">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Register New Device</h2>
+      <p class="modal-sub">A unique device ID and key will be generated automatically.</p>
+
+      <div class="field">
+        <label>Device Name *</label>
+        <input type="text" [(ngModel)]="addForm.name" placeholder="Sensor A - Zone 1" />
+      </div>
+
+      <div class="field">
+        <label>Zone (optional)</label>
+        <input type="text" [(ngModel)]="addForm.zone" placeholder="Production Floor" />
+      </div>
+
+      <div class="error" *ngIf="addError">{{ addError }}</div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="showAddModal = false">Cancel</button>
+        <button class="btn-primary" (click)="submitAdd()" [disabled]="addLoading || !addForm.name">
+          {{ addLoading ? 'Registering...' : 'Register Device' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

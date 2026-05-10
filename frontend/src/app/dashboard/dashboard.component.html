@@ -1,0 +1,67 @@
+<div class="dashboard">
+  <div class="header">
+    <h1>IoT monitoring</h1>
+    <div class="device-badge" *ngIf="measurement">
+      <div class="dot"></div>
+      {{ deviceId }} · live
+    </div>
+
+    <a routerLink="/devices" class="nav-link">Devices</a>
+    <button (click)="logout()">Logout</button>
+  </div>
+
+  <div class="metrics" *ngIf="measurement">
+    <div class="metric">
+      <div class="metric-label temp">Temperature</div>
+      <div class="metric-value temp">{{ latestTemp }}<span class="unit">°C</span></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label hum">Humidity</div>
+      <div class="metric-value hum">{{ latestHumidity }}<span class="unit">%</span></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Last updated</div>
+      <div class="metric-time">{{ measurement?.created_at | date:'HH:mm:ss' }}</div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-header">
+      <p class="chart-title">Temperature over time</p>
+      <div class="legend">
+        <span class="leg-item"><span class="leg-dot temp"></span>Temp (°C)</span>
+        <span class="leg-item"><span class="leg-dot hum"></span>Humidity (%)</span>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <canvas baseChart
+        [data]="chartData"
+        [options]="chartOptions"
+        type="line">
+      </canvas>
+    </div>
+  </div>
+
+  <div class="alerts-section" *ngIf="alerts.length > 0">
+    <div class="alert-card" *ngIf="alerts[0]?.severity === 'critical'">
+      <div class="alert-icon">⚠</div>
+      <div class="alert-content">
+        <div class="alert-title">High temperature detected</div>
+        <div class="alert-detail" *ngIf="alerts[0]?.temperature">
+          {{ alerts[0].temperature }}°C exceeds safe threshold
+        </div>
+      </div>
+    </div>
+
+    <div class="alert-list">
+      <div class="alert-list-title">Recent alerts</div>
+      <div class="alert-item" *ngFor="let alert of alerts">
+        <span class="alert-severity" [class.critical]="alert.severity === 'critical'">●</span>
+        <span class="alert-message">{{ alert.message }}</span>
+        <span class="alert-time" *ngIf="alert.created_at">
+          {{ alert.created_at | date:'HH:mm:ss' }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
